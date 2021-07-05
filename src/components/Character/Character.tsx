@@ -1,16 +1,32 @@
-import { CharacterT } from '../../Types/Character/Character';
+import { Draggable } from 'react-beautiful-dnd';
+import { CharacterT } from '../../Types/Character/CharacterT';
 import './Character.css';
 
 type CharacterProps = {
   character: CharacterT;
+  index: number;
 };
 
 export const Character = (props: CharacterProps) => {
-  const { name, img_url } = props.character;
+  const {
+    index,
+    character: { id, name, img_url }
+  } = props;
   return (
-    <div className="character">
-      <img src={img_url} alt={name} />
-      <div>{name}</div>
-    </div>
+    <Draggable draggableId={id.toString()} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={
+            snapshot.isDragging ? 'character character-selected' : 'character'
+          }
+        >
+          <img src={img_url} alt={name} />
+          <div>{name}</div>
+        </div>
+      )}
+    </Draggable>
   );
 };

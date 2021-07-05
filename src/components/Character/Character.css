@@ -24,3 +24,7 @@
   width: 100px;
   height: auto;
 }
+
+.character-selected {
+  background: rgba(255, 255, 255, 0.75);
+}

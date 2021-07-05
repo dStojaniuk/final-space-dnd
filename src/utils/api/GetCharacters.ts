@@ -1,4 +1,4 @@
-import { CharacterT } from '../Types/Character/Character';
+import { CharacterT } from '../../Types/Character/CharacterT';
 
 export default async function GetCharacters(
   numberOfCharacters?: number

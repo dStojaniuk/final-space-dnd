@@ -1,0 +1,8 @@
+.router {
+  width: 100%;
+}
+
+.routes {
+  display: flex;
+  justify-content: center;
+}

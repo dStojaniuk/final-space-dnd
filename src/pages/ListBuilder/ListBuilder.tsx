@@ -1,59 +1,117 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
-import { Character } from "../../components/Character/Character";
-import GetCharacters from "../../utils/api/GetCharacters";
-import { reorder } from "../../utils/helpers/reorder";
-import { CharacterT } from "../../utils/types/CharacterT";
-import "./ListBuilder.css";
+import React from 'react';
+import { useState, useEffect } from 'react';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { Character } from '../../components/Character/Character';
+import { DraggableCharacter } from '../../components/DraggableCharacter/DraggableCharacter';
+import GetCharacters from '../../utils/api/GetCharacters';
+import { CharacterT } from '../../utils/types/CharacterT';
+import './ListBuilder.css';
 
-/**
- * Moves an item from one list to another list.
- */
-const copy = (
-  source: CharacterT[],
-  destination: CharacterT[],
-  droppableSource: any,
-  droppableDestination: any
-) => {
-  console.log("==> dest", destination);
-
-  const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
-  const item = sourceClone[droppableSource.index];
-
-  destClone.splice(droppableDestination.index, 0, { ...item, id: Date.now() });
-  return destClone;
+const reorder = (list: CharacterT[], startIndex: number, endIndex: number) => {
+  const [removed] = list.splice(startIndex, 1);
+  list.splice(endIndex, 0, removed);
+  return list;
 };
 
-const move = (
-  source: CharacterT[],
+const copy = (
+  characters: CharacterT[],
   destination: CharacterT[],
   droppableSource: any,
   droppableDestination: any
 ) => {
-  const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
-  const [removed] = sourceClone.splice(droppableSource.index, 1);
+  const character = characters[droppableSource.index];
+  destination.splice(droppableDestination.index, 0, {
+    ...character,
+    id: Date.now()
+  });
+  return destination;
+};
 
-  destClone.splice(droppableDestination.index, 0, removed);
+const getCharacter =
+  (characters: CharacterT[]) => (provided: any, snapshot: any, rubric: any) => {
+    const character = characters[rubric.source.index];
+    return (
+      <div
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        className={
+          snapshot.isDragging ? 'character character-selected' : 'character'
+        }
+      >
+        <img src={character.img_url} alt={character.name} />
+        <div>{character.name}</div>
+      </div>
+    );
+  };
 
-  const result = [];
+const ToolbarList = (props: {
+  characters: CharacterT[];
+  className: string;
+  droppableId: string;
+}) => {
+  return (
+    <Droppable
+      renderClone={getCharacter(props.characters)}
+      droppableId={props.droppableId}
+      isDropDisabled={true}
+    >
+      {(provided, snapshot) => (
+        <div ref={provided.innerRef} className={props.className}>
+          {props.characters.map((item, index) => {
+            const shouldRenderClone =
+              item.id ===
+              (snapshot.draggingFromThisWith
+                ? +snapshot.draggingFromThisWith
+                : 0);
 
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
+            return (
+              <>
+                {shouldRenderClone ? (
+                  <Character className="copy" character={item} />
+                ) : (
+                  <DraggableCharacter
+                    character={item}
+                    index={index}
+                    key={item.id}
+                  />
+                )}
+              </>
+            );
+          })}
+          {provided.placeholder}
+        </div>
+      )}
+    </Droppable>
+  );
+};
 
-  return result;
+const List = (props: { items: CharacterT[] }) => {
+  return (
+    <Droppable droppableId="LIST">
+      {(provided) => (
+        <div ref={provided.innerRef}>
+          {props.items.length > 0 ? props.items.map((item, index) => (
+            <DraggableCharacter character={item} index={index} key={item.id} />
+          )) :
+            (
+              <div
+              className="character"
+            >
+              Drop characters here
+            </div>
+            )
+          }
+          {provided.placeholder}
+        </div>
+      )}
+    </Droppable>
+  );
 };
 
 export default function ListBuilder() {
   const [characters, setCharacters] = useState<CharacterT[]>([]);
-  const [state, setState] = useState<number>(Date.now());
+  const [shoppingBagItems, setShoppingBagItems] = useState<CharacterT[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -62,132 +120,44 @@ export default function ListBuilder() {
     })();
   }, []);
 
-  const handleDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
-    console.log("==> result", result);
+  const onDragEnd = React.useCallback(
+    (result) => {
+      const { source, destination } = result;
 
-    // dropped outside the list
-    if (!destination) {
-      return;
-    }
-
-    // switch (source.droppableId) {
-    //   case destination.droppableId:
-    //     setState({
-    //       [destination.droppableId]: reorder(
-    //         state[source.droppableId],
-    //         source.index,
-    //         destination.index
-    //       ),
-    //     });
-    //     break;
-    //   case "ITEMS":
-    //     setState({
-    //       [destination.droppableId]: copy(
-    //         ITEMS,
-    //         state[destination.droppableId],
-    //         source,
-    //         destination
-    //       ),
-    //     });
-    //     break;
-    //   default:
-    //     setState(
-    //       move(
-    //         state[source.droppableId],
-    //         state[destination.droppableId],
-    //         source,
-    //         destination
-    //       )
-    //     );
-    //     break;
-    // }
-  };
-
-  const addList = (e: any) => {
-    setState(Date.now());
-  };
-
-  // Normally you would want to split things out into separate components.
-  // But in this example everything is just done in one place for simplicity
-  return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Droppable droppableId="characters" isDropDisabled={true}>
-        {(provided, snapshot) => (
-          <div
-            className="characters-toolbox"
-            ref={provided.innerRef}
-            // isDraggingOver={snapshot.isDraggingOver}
-          >
-            {characters.map((item, index) => (
-              <Draggable
-                key={item.id}
-                draggableId={item.id.toString()}
-                index={index}
-              >
-                {(provided, snapshot) => (
-                  <>
-                    <div
-                      className="item"
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      // isDragging={snapshot.isDragging}
-                      // style={provided.draggableProps.style}
-                    >
-                      {item.name}
-                    </div>
-                    {snapshot.isDragging && (
-                      <div className="item clone">{item.name}</div>
-                    )}
-                  </>
-                )}
-              </Draggable>
-            ))}
-          </div>
-        )}
-      </Droppable>
-      {/* <div>
-        {Object.keys(state).map((list, i) => {
-          console.log("==> list", list);
-          return (
-            <Droppable key={list} droppableId={list}>
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  isDraggingOver={snapshot.isDraggingOver}
-                >
-                  {state[list].length
-                    ? state[list].map((item, index) => (
-                  <Draggable key={"1"} draggableId={"1"} index={1}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        isDragging={snapshot.isDragging}
-                        style={provided.draggableProps.style}
-                      >
-                        <div {...provided.dragHandleProps}>
-                          <svg width="24" height="24" viewBox="0 0 24 24">
-                            <path
-                              fill="currentColor"
-                              d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
-                            />
-                          </svg>
-                        </div>
-                        item.content
-                      </div>
-                    )}
-                  </Draggable>
-                  )
-                  : !provided.placeholder && <div>Drop items here</div>
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+      if (!destination) {
+        return;
+      }
+      console.log(`shoppingBagItems`, shoppingBagItems);
+      console.log('source.droppableId', source.droppableId);
+      switch (source.droppableId) {
+        case destination.droppableId:
+          setShoppingBagItems((state) =>
+            reorder(state, source.index, destination.index)
           );
-        })}
-      </div> */}
-    </DragDropContext>
+          break;
+        case 'TOOLBARLIST':
+          setShoppingBagItems((items) =>
+            copy(characters, items, source, destination)
+          );
+          break;
+        default:
+          console.log('default');
+          break;
+      }
+    },
+    [characters, shoppingBagItems]
+  );
+
+  return (
+    <div className="list-builder">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <List items={shoppingBagItems} />
+        <ToolbarList
+          characters={characters}
+          className="toolbarlist"
+          droppableId="TOOLBARLIST"
+        />
+      </DragDropContext>
+    </div>
   );
 }

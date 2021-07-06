@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import GetCharacters from "../../utils/api/GetCharacters";
 import { CharacterT } from "../../utils/types/CharacterT";
-import { Character } from "../Character/Character";
 import "./CharacterList.css";
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import { reorder } from "../../utils/helpers/reorder";
+import { DraggableCharacter } from "../DraggableCharacter/DraggableCharacter";
 
 export default function CharacterList() {
   const [characters, setCharacters] = useState<CharacterT[]>([]);
@@ -39,7 +39,7 @@ export default function CharacterList() {
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
             {characters.map((character, index) => (
-              <Character
+              <DraggableCharacter
                 character={character}
                 index={index}
                 key={character.id}

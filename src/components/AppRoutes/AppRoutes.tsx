@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Home from "../../pages/Home/Home";
 import List from "../../pages/List/List";
+import ListBuilder from "../../pages/ListBuilder/ListBuilder";
 import Navbar from "../Navbar/Navbar";
 import "./AppRoutes.css";
 
@@ -13,6 +14,9 @@ export default function AppRoutes() {
           <Switch>
             <Route path="/list">
               <List />
+            </Route>
+            <Route path="/list-builder">
+              <ListBuilder />
             </Route>
             <Route path="/">
               <Home />

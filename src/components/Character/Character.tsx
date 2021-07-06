@@ -1,5 +1,5 @@
 import { Draggable } from 'react-beautiful-dnd';
-import { CharacterT } from '../../Types/Character/CharacterT';
+import { CharacterT } from '../../utils/types/CharacterT';
 import './Character.css';
 
 type CharacterProps = {

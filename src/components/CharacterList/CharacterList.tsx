@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
-import GetCharacters from '../../utils/api/GetCharacters';
-import { CharacterT } from '../../Types/Character/CharacterT';
-import { Character } from '../Character/Character';
-import './CharacterList.css';
-import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import { reorder } from '../../utils/helpers/reorder';
+import { useEffect, useState } from "react";
+import GetCharacters from "../../utils/api/GetCharacters";
+import { CharacterT } from "../../utils/types/CharacterT";
+import { Character } from "../Character/Character";
+import "./CharacterList.css";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
+import { reorder } from "../../utils/helpers/reorder";
 
 export default function CharacterList() {
   const [characters, setCharacters] = useState<CharacterT[]>([]);
 
   useEffect(() => {
     (async () => {
-      const fetchedCharacters = await GetCharacters(10);
+      const fetchedCharacters = await GetCharacters();
       setCharacters(fetchedCharacters);
     })();
   }, []);

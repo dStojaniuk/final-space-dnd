@@ -1,20 +1,11 @@
-import { useEffect, useState } from "react";
-import GetCharacters from "../../utils/api/GetCharacters";
-import { CharacterT } from "../../utils/types/CharacterT";
-import "./CharacterList.css";
-import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
-import { reorder } from "../../utils/helpers/reorder";
-import { DraggableCharacter } from "../DraggableCharacter/DraggableCharacter";
+import { CharacterT } from '../../utils/types/CharacterT';
+import './CharacterList.css';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+import { reorder } from '../../utils/helpers/reorder';
+import { DraggableCharacter } from '../DraggableCharacter/DraggableCharacter';
 
-export default function CharacterList() {
-  const [characters, setCharacters] = useState<CharacterT[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      const fetchedCharacters = await GetCharacters();
-      setCharacters(fetchedCharacters);
-    })();
-  }, []);
+export const CharacterList = (props: CharacterListProps) => {
+  const { selectedCharacters, setSelectedCharacters } = props;
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -26,11 +17,11 @@ export default function CharacterList() {
     }
 
     const newCharacterList = reorder(
-      characters,
+      selectedCharacters,
       result.source.index,
       result.destination.index
     );
-    setCharacters(newCharacterList);
+    setSelectedCharacters(newCharacterList);
   };
 
   return (
@@ -38,7 +29,7 @@ export default function CharacterList() {
       <Droppable droppableId="characters">
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
-            {characters.map((character, index) => (
+            {selectedCharacters.map((character, index) => (
               <DraggableCharacter
                 character={character}
                 index={index}
@@ -51,4 +42,9 @@ export default function CharacterList() {
       </Droppable>
     </DragDropContext>
   );
-}
+};
+
+type CharacterListProps = {
+  selectedCharacters: CharacterT[];
+  setSelectedCharacters: React.Dispatch<React.SetStateAction<CharacterT[]>>;
+};

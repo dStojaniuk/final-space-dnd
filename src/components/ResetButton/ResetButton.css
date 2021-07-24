@@ -1,0 +1,15 @@
+.reset-button {
+  cursor: pointer;
+  padding: 1rem;
+  position: fixed;
+  top: 5.5rem;
+  right: 4rem;
+  background: rgba(223, 18, 18, 0.9);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-weight: 600;
+}

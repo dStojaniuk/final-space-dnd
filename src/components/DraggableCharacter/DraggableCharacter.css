@@ -28,15 +28,3 @@
 .character-selected {
   background: rgba(255, 255, 255, 0.75);
 }
-
-.copy {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.copy ~ div {
-  transform: none !important;
-}
-
-.copy ~ [data-rbd-placeholder-context-id] {
-  display: none !important;
-}

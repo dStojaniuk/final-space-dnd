@@ -8,6 +8,7 @@ function Navbar() {
       <div className="links">
         <Link to="/">Home</Link>
         <Link to="/list">List</Link>
+        <Link to="/list-builder">ListBuilder</Link>
       </div>
     </nav>
   );

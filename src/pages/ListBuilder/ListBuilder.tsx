@@ -10,6 +10,7 @@ import {
 } from 'react-beautiful-dnd';
 import { Character } from '../../components/Character/Character';
 import { DraggableCharacter } from '../../components/DraggableCharacter/DraggableCharacter';
+import { ResetButton } from '../../components/ResetButton/ResetButton';
 import { CharacterT } from '../../utils/types/CharacterT';
 import './ListBuilder.css';
 
@@ -140,6 +141,10 @@ export const ListBuilder = (props: ListBuilderProps) => {
   const { selectedCharacters, setSelectedCharacters, toolbarListCharacters } =
     props;
 
+  const handleListReset = () => {
+    setSelectedCharacters([]);
+  };
+
   const onDragEnd = useCallback(
     (result: DropResult) => {
       const { source, destination } = result;
@@ -177,6 +182,7 @@ export const ListBuilder = (props: ListBuilderProps) => {
           droppableId="TOOLBARLIST"
         />
       </DragDropContext>
+      <ResetButton onClickEvent={handleListReset} />
     </div>
   );
 };

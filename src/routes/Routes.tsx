@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Home from '../../pages/Home/Home';
-import { List } from '../../pages/List/List';
-import { ListBuilder } from '../../pages/ListBuilder/ListBuilder';
-import GetCharacters from '../../utils/api/GetCharacters';
-import { CharacterT } from '../../utils/types/CharacterT';
-import Navbar from '../Navbar/Navbar';
-import './AppRoutes.css';
+import Home from '../pages/Home/Home';
+import { List } from '../pages/List/List';
+import { ListBuilder } from '../pages/ListBuilder/ListBuilder';
+import GetCharacters from '../utils/api/GetCharacters';
+import { CharacterT } from '../utils/types/CharacterT';
+import Navbar from '../components/Navbar/Navbar';
+import './Routes.css';
 
-export default function AppRoutes() {
+export default function Routes() {
   const [fetchedCharacters, setFetchedCharacters] = useState<CharacterT[]>([]);
   const [listCharacters, setListCharacters] = useState<CharacterT[]>([]);
   const [listBuilderCharacters, setListBuilderCharacters] = useState<
@@ -31,6 +31,7 @@ export default function AppRoutes() {
           <Switch>
             <Route path="/list">
               <List
+                fetchedCharacters={fetchedCharacters}
                 selectedCharacters={listCharacters}
                 setSelectedCharacters={setListCharacters}
               />

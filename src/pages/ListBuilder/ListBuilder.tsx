@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import { Fragment, useCallback } from 'react';
 import {
   DragDropContext,
   DraggableLocation,
@@ -11,7 +10,6 @@ import {
 } from 'react-beautiful-dnd';
 import { Character } from '../../components/Character/Character';
 import { DraggableCharacter } from '../../components/DraggableCharacter/DraggableCharacter';
-import GetCharacters from '../../utils/api/GetCharacters';
 import { CharacterT } from '../../utils/types/CharacterT';
 import './ListBuilder.css';
 
@@ -79,7 +77,7 @@ const ToolbarList = (props: {
                 : 0);
 
             return (
-              <React.Fragment key={item.id}>
+              <Fragment key={item.id}>
                 {shouldRenderClone ? (
                   <Character className="copy" character={item} />
                 ) : (
@@ -89,7 +87,7 @@ const ToolbarList = (props: {
                     key={item.id}
                   />
                 )}
-              </React.Fragment>
+              </Fragment>
             );
           })}
           {provided.placeholder}
@@ -138,20 +136,11 @@ const List = (props: {
   );
 };
 
-export default function ListBuilder() {
-  const [characters, setCharacters] = useState<CharacterT[]>([]);
-  const [selectedCharacters, setSelectedCharacters] = useState<CharacterT[]>(
-    []
-  );
+export const ListBuilder = (props: ListBuilderProps) => {
+  const { selectedCharacters, setSelectedCharacters, toolbarListCharacters } =
+    props;
 
-  useEffect(() => {
-    (async () => {
-      const fetchedCharacters = await GetCharacters();
-      setCharacters(fetchedCharacters);
-    })();
-  }, []);
-
-  const onDragEnd = React.useCallback(
+  const onDragEnd = useCallback(
     (result: DropResult) => {
       const { source, destination } = result;
 
@@ -167,7 +156,7 @@ export default function ListBuilder() {
           break;
         case 'TOOLBARLIST':
           setSelectedCharacters((items) =>
-            copy(characters, items, source, destination)
+            copy(toolbarListCharacters, items, source, destination)
           );
           break;
         default:
@@ -175,7 +164,7 @@ export default function ListBuilder() {
           break;
       }
     },
-    [characters]
+    [toolbarListCharacters, setSelectedCharacters]
   );
 
   return (
@@ -183,11 +172,17 @@ export default function ListBuilder() {
       <DragDropContext onDragEnd={onDragEnd}>
         <List items={selectedCharacters} setItems={setSelectedCharacters} />
         <ToolbarList
-          characters={characters}
+          characters={toolbarListCharacters}
           className="toolbarlist"
           droppableId="TOOLBARLIST"
         />
       </DragDropContext>
     </div>
   );
-}
+};
+
+type ListBuilderProps = {
+  toolbarListCharacters: CharacterT[];
+  selectedCharacters: CharacterT[];
+  setSelectedCharacters: React.Dispatch<React.SetStateAction<CharacterT[]>>;
+};

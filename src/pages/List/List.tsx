@@ -1,10 +1,18 @@
-import CharacterList from '../../components/CharacterList/CharacterList';
+import { CharacterList } from '../../components/CharacterList/CharacterList';
+import { CharacterT } from '../../utils/types/CharacterT';
 import './List.css';
 
-function List() {
+export const List = (props: ListProps) => {
+  const { selectedCharacters, setSelectedCharacters } = props;
   return (
-    <CharacterList />
+    <CharacterList
+      selectedCharacters={selectedCharacters}
+      setSelectedCharacters={setSelectedCharacters}
+    />
   );
-}
+};
 
-export default List;
+type ListProps = {
+  selectedCharacters: CharacterT[];
+  setSelectedCharacters: React.Dispatch<React.SetStateAction<CharacterT[]>>;
+};

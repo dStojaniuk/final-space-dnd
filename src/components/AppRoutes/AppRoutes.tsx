@@ -1,11 +1,28 @@
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Home from "../../pages/Home/Home";
-import List from "../../pages/List/List";
-import ListBuilder from "../../pages/ListBuilder/ListBuilder";
-import Navbar from "../Navbar/Navbar";
-import "./AppRoutes.css";
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Home from '../../pages/Home/Home';
+import { List } from '../../pages/List/List';
+import { ListBuilder } from '../../pages/ListBuilder/ListBuilder';
+import GetCharacters from '../../utils/api/GetCharacters';
+import { CharacterT } from '../../utils/types/CharacterT';
+import Navbar from '../Navbar/Navbar';
+import './AppRoutes.css';
 
 export default function AppRoutes() {
+  const [fetchedCharacters, setFetchedCharacters] = useState<CharacterT[]>([]);
+  const [listCharacters, setListCharacters] = useState<CharacterT[]>([]);
+  const [listBuilderCharacters, setListBuilderCharacters] = useState<
+    CharacterT[]
+  >([]);
+
+  useEffect(() => {
+    (async () => {
+      const fetchedCharacters = await GetCharacters();
+      setFetchedCharacters(fetchedCharacters);
+      setListCharacters(fetchedCharacters);
+    })();
+  }, []);
+
   return (
     <div className="router">
       <Router>
@@ -13,10 +30,17 @@ export default function AppRoutes() {
         <div className="routes">
           <Switch>
             <Route path="/list">
-              <List />
+              <List
+                selectedCharacters={listCharacters}
+                setSelectedCharacters={setListCharacters}
+              />
             </Route>
             <Route path="/list-builder">
-              <ListBuilder />
+              <ListBuilder
+                toolbarListCharacters={fetchedCharacters}
+                selectedCharacters={listBuilderCharacters}
+                setSelectedCharacters={setListBuilderCharacters}
+              />
             </Route>
             <Route path="/">
               <Home />

@@ -99,7 +99,15 @@ const ToolbarList = (props: {
   );
 };
 
-const List = (props: { items: CharacterT[] }) => {
+const List = (props: {
+  items: CharacterT[];
+  setItems: React.Dispatch<React.SetStateAction<CharacterT[]>>;
+}) => {
+  const deleteCharacter = (characterId: number) => {
+    const newCharactersList = props.items.filter((c) => c.id !== characterId);
+    props.setItems(newCharactersList);
+  };
+
   return (
     <Droppable droppableId="LIST">
       {(provided, snapshot) => (
@@ -110,6 +118,8 @@ const List = (props: { items: CharacterT[] }) => {
                 character={item}
                 index={index}
                 key={item.id}
+                showDeleteIcon
+                handleOnDeleteClick={() => deleteCharacter(item.id)}
               />
             ))
           ) : (
@@ -130,7 +140,9 @@ const List = (props: { items: CharacterT[] }) => {
 
 export default function ListBuilder() {
   const [characters, setCharacters] = useState<CharacterT[]>([]);
-  const [shoppingBagItems, setShoppingBagItems] = useState<CharacterT[]>([]);
+  const [selectedCharacters, setSelectedCharacters] = useState<CharacterT[]>(
+    []
+  );
 
   useEffect(() => {
     (async () => {
@@ -149,17 +161,17 @@ export default function ListBuilder() {
 
       switch (source.droppableId) {
         case destination.droppableId:
-          setShoppingBagItems((state) =>
+          setSelectedCharacters((state) =>
             reorder(state, source.index, destination.index)
           );
           break;
         case 'TOOLBARLIST':
-          setShoppingBagItems((items) =>
+          setSelectedCharacters((items) =>
             copy(characters, items, source, destination)
           );
           break;
         default:
-          console.error('Error onDragEnd');
+          console.error('Error: onDragEnd');
           break;
       }
     },
@@ -169,7 +181,7 @@ export default function ListBuilder() {
   return (
     <div className="list-builder">
       <DragDropContext onDragEnd={onDragEnd}>
-        <List items={shoppingBagItems} />
+        <List items={selectedCharacters} setItems={setSelectedCharacters} />
         <ToolbarList
           characters={characters}
           className="toolbarlist"

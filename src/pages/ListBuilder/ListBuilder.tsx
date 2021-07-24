@@ -1,6 +1,14 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import {
+  DragDropContext,
+  DraggableLocation,
+  DraggableProvided,
+  DraggableRubric,
+  DraggableStateSnapshot,
+  Droppable,
+  DropResult
+} from 'react-beautiful-dnd';
 import { Character } from '../../components/Character/Character';
 import { DraggableCharacter } from '../../components/DraggableCharacter/DraggableCharacter';
 import GetCharacters from '../../utils/api/GetCharacters';
@@ -16,8 +24,8 @@ const reorder = (list: CharacterT[], startIndex: number, endIndex: number) => {
 const copy = (
   characters: CharacterT[],
   destination: CharacterT[],
-  droppableSource: any,
-  droppableDestination: any
+  droppableSource: DraggableLocation,
+  droppableDestination: DraggableLocation
 ) => {
   const character = characters[droppableSource.index];
   destination.splice(droppableDestination.index, 0, {
@@ -28,7 +36,12 @@ const copy = (
 };
 
 const getCharacter =
-  (characters: CharacterT[]) => (provided: any, snapshot: any, rubric: any) => {
+  (characters: CharacterT[]) =>
+  (
+    provided: DraggableProvided,
+    snapshot: DraggableStateSnapshot,
+    rubric: DraggableRubric
+  ) => {
     const character = characters[rubric.source.index];
     return (
       <div
@@ -66,7 +79,7 @@ const ToolbarList = (props: {
                 : 0);
 
             return (
-              <>
+              <React.Fragment key={item.id}>
                 {shouldRenderClone ? (
                   <Character className="copy" character={item} />
                 ) : (
@@ -76,7 +89,7 @@ const ToolbarList = (props: {
                     key={item.id}
                   />
                 )}
-              </>
+              </React.Fragment>
             );
           })}
           {provided.placeholder}
@@ -89,19 +102,25 @@ const ToolbarList = (props: {
 const List = (props: { items: CharacterT[] }) => {
   return (
     <Droppable droppableId="LIST">
-      {(provided) => (
+      {(provided, snapshot) => (
         <div ref={provided.innerRef}>
-          {props.items.length > 0 ? props.items.map((item, index) => (
-            <DraggableCharacter character={item} index={index} key={item.id} />
-          )) :
-            (
-              <div
-              className="character"
+          {props.items.length > 0 ? (
+            props.items.map((item, index) => (
+              <DraggableCharacter
+                character={item}
+                index={index}
+                key={item.id}
+              />
+            ))
+          ) : (
+            <div
+              className={
+                snapshot.isDraggingOver ? 'character dragOver' : 'character'
+              }
             >
               Drop characters here
             </div>
-            )
-          }
+          )}
           {provided.placeholder}
         </div>
       )}
@@ -121,14 +140,13 @@ export default function ListBuilder() {
   }, []);
 
   const onDragEnd = React.useCallback(
-    (result) => {
+    (result: DropResult) => {
       const { source, destination } = result;
 
       if (!destination) {
         return;
       }
-      console.log(`shoppingBagItems`, shoppingBagItems);
-      console.log('source.droppableId', source.droppableId);
+
       switch (source.droppableId) {
         case destination.droppableId:
           setShoppingBagItems((state) =>
@@ -141,11 +159,11 @@ export default function ListBuilder() {
           );
           break;
         default:
-          console.log('default');
+          console.error('Error onDragEnd');
           break;
       }
     },
-    [characters, shoppingBagItems]
+    [characters]
   );
 
   return (

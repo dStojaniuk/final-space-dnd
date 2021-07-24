@@ -29,12 +29,12 @@
   background: rgba(255, 255, 255, 0.75);
 }
 
-.copy ~ div {
-  transform: none !important;
+.copy {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.copy {
-  background: lightblue;
+.copy ~ div {
+  transform: none !important;
 }
 
 .copy ~ [data-rbd-placeholder-context-id] {

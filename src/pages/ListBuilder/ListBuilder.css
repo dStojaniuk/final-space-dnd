@@ -6,10 +6,6 @@
   margin-left: 1rem;
 }
 
-.copy ~ li {
-  transform: none !important;
-}
-
-.copy ~ [data-rbd-placeholder-context-id] {
-  display: none !important;
+.dragOver {
+  background: rgba(255, 255, 255, 0.9);
 }

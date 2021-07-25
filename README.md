@@ -2,7 +2,9 @@
 # Final Space DnD
 
 The purpose of the application is to help you understand the use of the react-beautiful-dnd library.
+
 React beautiful dnd library link: https://github.com/atlassian/react-beautiful-dnd
+
 The Final Space data comes from api: https://finalspaceapi.com/
 
 ## Demo
